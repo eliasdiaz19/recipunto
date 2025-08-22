@@ -1,7 +1,7 @@
 // src/app/page.tsx
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import AddBoxControl from '@/components/Map/AddBoxControl'
 import Login from '@/components/Auth/Login'
@@ -24,7 +24,7 @@ const RecipuntoMap = dynamic(() => import('@/components/Map/MapContainer'), {
 
 export default function Home() {
   const { user, loading: authLoading } = useAuth()
-  const { boxes, addBox, updateBox, deleteBox, moveBox, refresh } = useBoxes()
+  const { boxes, addBox, updateBox, deleteBox, moveBox } = useBoxes()
   const [showAddBox, setShowAddBox] = useState(false)
   const [newBoxLocation, setNewBoxLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [authView, setAuthView] = useState<'login' | 'signup'>('login')

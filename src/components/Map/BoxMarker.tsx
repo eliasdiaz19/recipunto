@@ -7,7 +7,7 @@ import type { LatLngExpression } from 'leaflet'
 import { Box } from '@/lib/types'
 import StatusBadge from '../BoxStatus/StatusBadge'
 import ContainerCounter from '../BoxStatus/ContainerCounter'
-import UpdateBoxForm from '../Box/UpdateBoxForm'
+// UpdateBoxForm se usa en el componente padre
 
 interface BoxMarkerProps {
   box: Box
