@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+# Ejecutar pruebas antes de hacer push
+npm run test:ci
