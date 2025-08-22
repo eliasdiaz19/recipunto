@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase'
 export default function Login() {
   const { validateEmail, validatePassword } = useValidation()
   
-  const { values, errors, isSubmitting, handleChange, handleBlur, handleSubmit } = useForm({
+  const { values, errors, isSubmitting, handleChange, handleBlur, handleSubmit, clearErrors } = useForm({
     initialValues: {
       email: '',
       password: ''
@@ -23,12 +23,39 @@ export default function Login() {
       }
     },
     onSubmit: async (values) => {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password,
-      })
+      try {
+        clearErrors() // Limpiar errores previos
+        
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: values.email,
+          password: values.password,
+        })
 
-      if (error) {
+        if (error) {
+          throw new Error(error.message)
+        }
+
+        // Crear o actualizar el perfil del usuario después de login
+        const user = data.user
+        if (user) {
+          const username = (user.user_metadata as any)?.username || user.email?.split('@')[0] || 'usuario'
+
+          const { error: profileError } = await supabase
+            .from('users')
+            .upsert(
+              {
+                id: user.id,
+                username,
+              },
+              { onConflict: 'id' }
+            )
+          
+          if (profileError) {
+            console.warn('Error creando perfil de usuario:', profileError)
+            // No lanzar error aquí, solo log para debugging
+          }
+        }
+      } catch (error: any) {
         throw new Error(error.message)
       }
     }
@@ -42,6 +69,13 @@ export default function Login() {
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Mostrar error general si existe */}
+        {errors._general && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+            {errors._general}
+          </div>
+        )}
+        
         <FormField
           name="email"
           label="Correo electrónico"

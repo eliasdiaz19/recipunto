@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase'
 export default function SignUp() {
   const { validateEmail, validatePassword, validateUsername } = useValidation()
   
-  const { values, errors, isSubmitting, handleChange, handleBlur, handleSubmit } = useForm({
+  const { values, errors, isSubmitting, handleChange, handleBlur, handleSubmit, clearErrors } = useForm({
     initialValues: {
       username: '',
       email: '',
@@ -29,32 +29,32 @@ export default function SignUp() {
     },
     onSubmit: async (values) => {
       try {
-        const { data: authData, error: authError } = await supabase.auth.signUp({
+        clearErrors() // Limpiar errores previos
+        
+        // Verificar si el email ya está registrado
+        const { data: existingUser } = await supabase.auth.admin.getUserByEmail(values.email)
+        if (existingUser) {
+          throw new Error('Este email ya está registrado. Por favor, inicia sesión o usa otro email.')
+        }
+
+        // Guardamos el username en metadata para recuperarlo al iniciar sesión
+        const { data, error: authError } = await supabase.auth.signUp({
           email: values.email,
           password: values.password,
+          options: {
+            data: {
+              username: values.username,
+            },
+          },
         })
 
         if (authError) throw authError
 
-        if (authData.user) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-
-          const { error: profileError } = await supabase
-            .from('users')
-            .insert([{ 
-              id: authData.user.id, 
-              username: values.username
-            }])
-
-          if (profileError) {
-            // No es posible borrar el usuario desde el cliente (requiere key de servicio)
-            // Informamos el error para que se resuelva manualmente o vía backend
-            console.error('Error creando perfil de usuario:', profileError)
-            throw profileError
-          }
+        if (data.user) {
+          alert('Registro exitoso. Por favor, revisa tu email para confirmar la cuenta.');
+          // Limpiar el formulario
+          clearErrors()
         }
-
-        alert('Registro exitoso. Por favor, revisa tu email para confirmar la cuenta.');
       } catch (error: any) {
         throw new Error(error.message)
       }
@@ -69,6 +69,13 @@ export default function SignUp() {
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Mostrar error general si existe */}
+        {errors._general && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+            {errors._general}
+          </div>
+        )}
+        
         <FormField
           name="username"
           label="Nombre de usuario"

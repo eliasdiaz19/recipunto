@@ -132,8 +132,13 @@ export function useForm({ initialValues, validationRules = {}, onSubmit }: UseFo
     setIsSubmitting(true)
     try {
       await onSubmit(values)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error en submit:', error)
+      // Establecer un error general del formulario
+      setErrors(prev => ({
+        ...prev,
+        _general: error?.message || 'Ha ocurrido un error inesperado'
+      }))
     } finally {
       setIsSubmitting(false)
     }
@@ -168,6 +173,7 @@ export function useForm({ initialValues, validationRules = {}, onSubmit }: UseFo
     reset,
     setValue,
     setError,
-    validateField
+    validateField,
+    clearErrors: () => setErrors({})
   }
 }
