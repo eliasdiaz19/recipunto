@@ -58,14 +58,6 @@ const RecipuntoMap = memo(function RecipuntoMap({
   onShowUpdateForm
 }: RecipuntoMapProps) {
   // Memoizar las funciones de callback para evitar re-renders innecesarios
-  const memoizedOnUpdateBox = useCallback((boxId: string, updates: Partial<Box>) => {
-    return onUpdateBox(boxId, updates)
-  }, [onUpdateBox])
-  
-  const memoizedOnDeleteBox = useCallback((boxId: string) => {
-    return onDeleteBox(boxId)
-  }, [onDeleteBox])
-  
   const memoizedOnMoveBox = useCallback((boxId: string, newLocation: { lat: number; lng: number }) => {
     return onMoveBox(boxId, newLocation)
   }, [onMoveBox])
@@ -88,19 +80,15 @@ const RecipuntoMap = memo(function RecipuntoMap({
       <BoxMarker 
         key={box.id} 
         box={box} 
-        onUpdate={memoizedOnUpdateBox}
-        onDelete={memoizedOnDeleteBox}
         onMove={memoizedOnMoveBox}
-        onMapClick={onMapClick}
         isMovingMode={movingBoxId === box.id}
         tempLocation={movingBoxId === box.id ? tempLocation : null}
         onStartMoving={memoizedOnStartMoving}
         onCancelMoving={memoizedOnCancelMoving}
-        isMoving={movingBoxId === box.id}
         onShowUpdateForm={memoizedOnShowUpdateForm}
       />
     ))
-  , [boxes, movingBoxId, tempLocation, onMapClick, memoizedOnUpdateBox, memoizedOnDeleteBox, memoizedOnMoveBox, memoizedOnStartMoving, memoizedOnCancelMoving, memoizedOnShowUpdateForm])
+  , [boxes, movingBoxId, tempLocation, memoizedOnMoveBox, memoizedOnStartMoving, memoizedOnCancelMoving, memoizedOnShowUpdateForm])
 
   return (
     <LeafletMap
