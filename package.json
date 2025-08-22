@@ -20,7 +20,7 @@
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
     "e2e:debug": "playwright test --debug",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.55.0",
@@ -43,6 +43,7 @@
     "clsx": "^2.1.1",
     "eslint": "^9",
     "eslint-config-next": "15.5.0",
+    "husky": "^9.1.7",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4",
     "typescript": "^5"
