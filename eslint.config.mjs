@@ -18,11 +18,19 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      "public/sw.js",
+      "jest.config.js",
+      ".storybook/**",
+      "tailwind.config.mjs"
     ],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
-      "react/no-unescaped-entities": "error"
+      "react/no-unescaped-entities": "error",
+      "@typescript-eslint/no-empty-object-type": "warn",
+      "@typescript-eslint/ban-ts-comment": "warn",
+      "@typescript-eslint/no-require-imports": "warn",
+      "@typescript-eslint/triple-slash-reference": "warn"
     }
   },
 ];

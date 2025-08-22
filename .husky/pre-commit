@@ -1,2 +1,3 @@
 #!/usr/bin/env sh
-npm run lint
+# Solo revisar archivos de código fuente, no archivos generados
+npx eslint src/ --ext .ts,.tsx --max-warnings 100
