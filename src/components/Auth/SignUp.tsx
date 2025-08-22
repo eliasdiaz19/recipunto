@@ -31,12 +31,6 @@ export default function SignUp() {
       try {
         clearErrors() // Limpiar errores previos
         
-        // Verificar si el email ya está registrado
-        const { data: existingUser } = await supabase.auth.admin.getUserByEmail(values.email)
-        if (existingUser) {
-          throw new Error('Este email ya está registrado. Por favor, inicia sesión o usa otro email.')
-        }
-
         // Guardamos el username en metadata para recuperarlo al iniciar sesión
         const { data, error: authError } = await supabase.auth.signUp({
           email: values.email,
