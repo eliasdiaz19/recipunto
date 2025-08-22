@@ -11,12 +11,8 @@ import ContainerCounter from '../BoxStatus/ContainerCounter'
 
 interface BoxMarkerProps {
   box: Box
-  onUpdate: (boxId: string, updates: Partial<Box>) => Promise<void>
-  onDelete: (boxId: string) => Promise<void>
   onMove: (boxId: string, newLocation: { lat: number; lng: number }) => Promise<void>
-  onMapClick?: (latlng: { lat: number; lng: number }) => void
   isMovingMode?: boolean
-  isMoving?: boolean
   tempLocation?: { lat: number; lng: number } | null
   onStartMoving: (boxId: string) => void
   onCancelMoving: () => void
@@ -25,12 +21,8 @@ interface BoxMarkerProps {
 
 const BoxMarker = memo(function BoxMarker({ 
   box, 
-  onUpdate, 
-  onDelete, 
   onMove, 
-  onMapClick,
   isMovingMode,
-  isMoving,
   tempLocation,
   onStartMoving,
   onCancelMoving,

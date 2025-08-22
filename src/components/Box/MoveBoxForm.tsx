@@ -13,11 +13,11 @@ export default function MoveBoxForm({ box, onMove, onCancel }: MoveBoxFormProps)
   const [isLoading, setIsLoading] = useState(false)
   const [newLocation, setNewLocation] = useState<{ lat: number; lng: number } | null>(null)
 
-  const handleMapClick = (e: any) => {
-    // Obtener las coordenadas del clic en el mapa
-    const { lat, lng } = e.latlng
-    setNewLocation({ lat, lng })
-  }
+  // handleMapClick se usará cuando se implemente la funcionalidad de clic en el mapa
+  // const handleMapClick = (e: any) => {
+  //   const { lat, lng } = e.latlng
+  //   setNewLocation({ lat, lng })
+  // }
 
   const handleConfirmMove = async () => {
     if (!newLocation) return
