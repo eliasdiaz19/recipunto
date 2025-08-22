@@ -38,7 +38,7 @@ const DefaultLoadingFallback = ({ message = 'Cargando...', showSpinner = true }:
 )
 
 // Fallback de error por defecto
-const DefaultErrorFallback = ({ error, retry, reset }: ErrorFallbackProps) => (
+const DefaultErrorFallback = ({ error: _error, retry, reset }: ErrorFallbackProps) => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
     <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
       <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
@@ -98,7 +98,7 @@ const CustomSuspense = ({
   children, 
   fallback, 
   errorFallback,
-  _timeout = 10000,
+  timeout: _timeout = 10000,
   onRetry 
 }: CustomSuspenseProps) => {
   const [key, setKey] = useState(0)
