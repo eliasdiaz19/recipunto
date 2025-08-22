@@ -48,8 +48,6 @@ const MapClickHandler = memo(function MapClickHandler({
 const RecipuntoMap = memo(function RecipuntoMap({ 
   boxes, 
   onMapClick, 
-  onUpdateBox, 
-  onDeleteBox, 
   onMoveBox,
   movingBoxId,
   tempLocation,
