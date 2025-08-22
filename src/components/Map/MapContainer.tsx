@@ -58,12 +58,29 @@ const RecipuntoMap = memo(function RecipuntoMap({
   onShowUpdateForm
 }: RecipuntoMapProps) {
   // Memoizar las funciones de callback para evitar re-renders innecesarios
-  const memoizedOnUpdateBox = useCallback(onUpdateBox, [])
-  const memoizedOnDeleteBox = useCallback(onDeleteBox, [])
-  const memoizedOnMoveBox = useCallback(onMoveBox, [])
-  const memoizedOnStartMoving = useCallback(onStartMoving, [])
-  const memoizedOnCancelMoving = useCallback(onCancelMoving, [])
-  const memoizedOnShowUpdateForm = useCallback(onShowUpdateForm, [])
+  const memoizedOnUpdateBox = useCallback((boxId: string, updates: Partial<Box>) => {
+    return onUpdateBox(boxId, updates)
+  }, [onUpdateBox])
+  
+  const memoizedOnDeleteBox = useCallback((boxId: string) => {
+    return onDeleteBox(boxId)
+  }, [onDeleteBox])
+  
+  const memoizedOnMoveBox = useCallback((boxId: string, newLocation: { lat: number; lng: number }) => {
+    return onMoveBox(boxId, newLocation)
+  }, [onMoveBox])
+  
+  const memoizedOnStartMoving = useCallback((boxId: string) => {
+    return onStartMoving(boxId)
+  }, [onStartMoving])
+  
+  const memoizedOnCancelMoving = useCallback(() => {
+    return onCancelMoving()
+  }, [onCancelMoving])
+  
+  const memoizedOnShowUpdateForm = useCallback((box: Box) => {
+    return onShowUpdateForm(box)
+  }, [onShowUpdateForm])
 
   // Memoizar los marcadores para evitar re-renders cuando no cambian
   const markers = useMemo(() => 
