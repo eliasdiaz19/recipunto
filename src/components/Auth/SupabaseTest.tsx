@@ -58,7 +58,8 @@ export default function SupabaseTest() {
     setStatus('Probando registro...')
     
     try {
-      const testEmail = `test-${Date.now()}@example.com`
+      // Usar un email válido para pruebas
+      const testEmail = `test-${Date.now()}@gmail.com`
       const { data, error } = await supabase.auth.signUp({
         email: testEmail,
         password: 'test123456',
