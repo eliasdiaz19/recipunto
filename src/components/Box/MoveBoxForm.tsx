@@ -11,7 +11,7 @@ interface MoveBoxFormProps {
 
 export default function MoveBoxForm({ box, onMove, onCancel }: MoveBoxFormProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const [newLocation, setNewLocation] = useState<{ lat: number; lng: number } | null>(null)
+  const [newLocation, _setNewLocation] = useState<{ lat: number; lng: number } | null>(null)
 
   // handleMapClick se usará cuando se implemente la funcionalidad de clic en el mapa
   // const handleMapClick = (e: any) => {
