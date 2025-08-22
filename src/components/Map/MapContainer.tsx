@@ -23,15 +23,13 @@ interface RecipuntoMapProps {
 }
 
 const MapClickHandler = memo(function MapClickHandler({ 
-  onMapClick, 
-  movingBoxId 
+  onMapClick
 }: { 
   onMapClick?: (latlng: { lat: number; lng: number }) => void
-  movingBoxId: string | null
 }) {
   const { throttle } = useMapOptimization({ throttleDelay: 100 })
 
-  const handleMapEvent = useCallback((e: any, type: string) => {
+  const handleMapEvent = useCallback((e: any) => {
     // Verificar que el evento sea directamente en el contenedor del mapa
     if (e.originalEvent.target.classList.contains('leaflet-container')) {
       if (onMapClick) {
@@ -41,7 +39,7 @@ const MapClickHandler = memo(function MapClickHandler({
   }, [onMapClick, throttle])
 
   useMapEvents({
-    click: (e) => handleMapEvent(e, 'click'),
+    click: (e) => handleMapEvent(e),
   })
   
   return null
@@ -98,8 +96,7 @@ const RecipuntoMap = memo(function RecipuntoMap({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <MapClickHandler 
-        onMapClick={onMapClick} 
-        movingBoxId={movingBoxId}
+        onMapClick={onMapClick}
       />
       {markers}
     </LeafletMap>
