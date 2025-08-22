@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useCallback, useState } from 'react'
 
-interface WorkerMessage {
-  id: string
-  type: string
-  data?: any
-}
+// WorkerMessage interface - se usará cuando se implemente la funcionalidad completa
+// interface WorkerMessage {
+//   id: string
+//   type: string
+//   data?: any
+// }
 
 interface WorkerResponse {
   id: string
