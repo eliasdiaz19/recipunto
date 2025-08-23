@@ -35,7 +35,7 @@ export function useRealtimeNotifications() {
     setTimeout(() => {
       removeNotification(newNotification.id)
     }, 5000)
-  }, [isEnabled])
+  }, [isEnabled, removeNotification])
 
   const removeNotification = useCallback((id: string) => {
     setNotifications(prev => prev.filter(n => n.id !== id))
