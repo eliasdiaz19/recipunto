@@ -1,7 +1,7 @@
 // src/hooks/useRealtimeDebug.ts
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef } from 'react'
 
 export interface RealtimeDebugInfo {
   connectionStatus: string

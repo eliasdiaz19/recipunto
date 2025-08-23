@@ -3,7 +3,6 @@
 
 import { useEffect, useState } from 'react'
 import { RealtimeNotification } from '@/hooks/useRealtimeNotifications'
-import { Badge } from './Badge'
 
 interface NotificationToastProps {
   notification: RealtimeNotification

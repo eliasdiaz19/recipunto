@@ -5,13 +5,12 @@ import { useRealtimeStatus } from '@/hooks/useRealtimeStatus'
 import { Badge } from './Badge'
 
 export function RealtimeIndicator() {
-  const { 
-    status, 
-    isConnected, 
-    isConnecting, 
-    hasError, 
-    lastUpdate, 
-    reconnect 
+  const {
+    isConnected,
+    isConnecting,
+    hasError,
+    lastUpdate,
+    reconnect
   } = useRealtimeStatus()
 
   const getStatusColor = () => {

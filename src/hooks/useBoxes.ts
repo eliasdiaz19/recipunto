@@ -101,7 +101,7 @@ export function useBoxes() {
   }, [debug])
 
   // Función para verificar si los datos han cambiado realmente
-  const hasDataChanged = useCallback((boxId: string, newData: any): boolean => {
+  const hasDataChanged = useCallback((boxId: string, _newData: any): boolean => {
     const currentVersion = boxVersions.current.get(boxId) || 0
     const newVersion = currentVersion + 1
     

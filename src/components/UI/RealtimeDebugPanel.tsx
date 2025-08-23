@@ -19,7 +19,7 @@ export function RealtimeDebugPanel() {
     if (debug.updateConnectionStatus) {
       realtimeStatus.registerDebugCallback(debug.updateConnectionStatus)
     }
-  }, [debug.updateConnectionStatus, realtimeStatus.registerDebugCallback])
+  }, [debug.updateConnectionStatus, realtimeStatus.registerDebugCallback, realtimeStatus])
 
   // Solo mostrar en desarrollo
   if (process.env.NODE_ENV !== 'development') {

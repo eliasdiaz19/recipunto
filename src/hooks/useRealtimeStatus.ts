@@ -29,7 +29,7 @@ export function useRealtimeStatus() {
       }
       
       // Verificar conexión básica
-      const { data, error } = await supabase.from('boxes').select('count').limit(1)
+      const { error } = await supabase.from('boxes').select('count').limit(1)
       
       if (error) {
         console.error('Error checking connection:', error)

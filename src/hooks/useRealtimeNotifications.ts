@@ -1,7 +1,7 @@
 // src/hooks/useRealtimeNotifications.ts
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { Box } from '@/lib/types'
 
 export interface RealtimeNotification {
@@ -79,7 +79,7 @@ export function useRealtimeNotifications() {
     })
   }, [addNotification])
 
-  const notifyBoxDeleted = useCallback((boxId: string) => {
+  const notifyBoxDeleted = useCallback((_boxId: string) => {
     addNotification({
       type: 'warning',
       title: 'Caja eliminada',
