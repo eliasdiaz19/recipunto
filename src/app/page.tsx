@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic'
 import AddBoxControl from '@/components/Map/AddBoxControl'
 import Login from '@/components/Auth/Login'
 import SignUp from '@/components/Auth/SignUp'
-import SupabaseTest from '@/components/Auth/SupabaseTest'
+
 import { useBoxes } from '@/hooks/useBoxes'
 import { useAuth } from '@/hooks/useAuth'
 import { Box } from '@/lib/types'
@@ -152,10 +152,7 @@ export default function Home() {
             </>
           )}
           
-          {/* Componente de prueba para diagnosticar Supabase */}
-          <div className="mt-8">
-            <SupabaseTest />
-          </div>
+
         </div>
       </div>
     )
