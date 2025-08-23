@@ -37,7 +37,7 @@ export default function Card({
       )}
       
       <div className={cn(
-        'p-6 space-y-5 bg-white',
+        'p-6 space-y-5 bg-white text-black',
         contentClassName
       )}>
         {children}

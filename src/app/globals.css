@@ -76,4 +76,26 @@ body {
     min-height: 44px;
     padding: 12px 16px;
   }
+  
+  /* Garantizar legibilidad del texto en móvil */
+  input, textarea, select {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+  }
+  
+  /* Asegurar que las etiquetas sean legibles */
+  label {
+    color: #374151 !important;
+    -webkit-text-fill-color: #374151 !important;
+  }
+  
+  /* Texto del contenido de las tarjetas */
+  .bg-white {
+    color: #000000 !important;
+  }
+  
+  /* Texto de los botones */
+  button {
+    color: inherit !important;
+  }
 }
