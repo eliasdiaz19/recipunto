@@ -12,6 +12,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { Box } from '@/lib/types'
 import { supabase } from '@/lib/supabase'
 import UpdateBoxForm from '@/components/Box/UpdateBoxForm'
+import { RealtimeIndicator, NotificationContainer, RealtimeDebugPanel } from '@/components/UI'
 
 // Importación dinámica para evitar SSR con Leaflet
 const RecipuntoMap = dynamic(() => import('@/components/Map/MapContainer'), {
@@ -25,7 +26,15 @@ const RecipuntoMap = dynamic(() => import('@/components/Map/MapContainer'), {
 
 export default function Home() {
   const { user, loading: authLoading } = useAuth()
-  const { boxes, addBox, updateBox, deleteBox, moveBox } = useBoxes()
+  const { 
+    boxes, 
+    addBox, 
+    updateBox, 
+    deleteBox, 
+    moveBox, 
+    notifications, 
+    removeNotification 
+  } = useBoxes()
   const [showAddBox, setShowAddBox] = useState(false)
   const [newBoxLocation, setNewBoxLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [authView, setAuthView] = useState<'login' | 'signup'>('login')
@@ -176,6 +185,9 @@ export default function Home() {
             
             {/* Información del usuario y botón de cerrar sesión */}
             <div className="flex items-center space-x-4">
+              {/* Indicador de estado Realtime */}
+              <RealtimeIndicator />
+              
               <span className="hidden sm:block text-gray-600 text-sm">
                 Hola, <span className="font-medium text-gray-800">{user.email}</span>
               </span>
@@ -242,6 +254,15 @@ export default function Home() {
           />
         </div>
       )}
+
+      {/* Notificaciones en tiempo real */}
+      <NotificationContainer
+        notifications={notifications}
+        onRemove={removeNotification}
+      />
+
+      {/* Panel de debug (solo en desarrollo) */}
+      <RealtimeDebugPanel />
     </div>
   )
 }

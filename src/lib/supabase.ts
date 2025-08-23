@@ -13,11 +13,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
   `)
 }
 
-// Creamos y exportamos el cliente de Supabase
+// Creamos y exportamos el cliente de Supabase con Realtime habilitado
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 10
+    }
   }
 })
 
@@ -40,4 +45,28 @@ export const signOut = async () => {
 export const testConnection = async () => {
   const { data, error } = await supabase.from('boxes').select('count')
   return { data, error }
+}
+
+// Función para habilitar Realtime en la tabla boxes
+export const enableRealtimeForBoxes = () => {
+  return supabase
+    .channel('boxes_changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'boxes'
+      },
+      (payload) => {
+        console.log('Cambio en tiempo real detectado:', payload)
+        return payload
+      }
+    )
+    .subscribe()
+}
+
+// Función para deshabilitar Realtime
+export const disableRealtime = () => {
+  return supabase.removeAllChannels()
 }
