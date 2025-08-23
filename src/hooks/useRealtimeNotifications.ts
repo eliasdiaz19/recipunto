@@ -20,6 +20,10 @@ export function useRealtimeNotifications() {
   const [notifications, setNotifications] = useState<RealtimeNotification[]>([])
   const [isEnabled, setIsEnabled] = useState(true)
 
+  const removeNotification = useCallback((id: string) => {
+    setNotifications(prev => prev.filter(n => n.id !== id))
+  }, [])
+
   const addNotification = useCallback((notification: Omit<RealtimeNotification, 'id' | 'timestamp'>) => {
     if (!isEnabled) return
 
@@ -36,10 +40,6 @@ export function useRealtimeNotifications() {
       removeNotification(newNotification.id)
     }, 5000)
   }, [isEnabled, removeNotification])
-
-  const removeNotification = useCallback((id: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== id))
-  }, [])
 
   const clearNotifications = useCallback(() => {
     setNotifications([])

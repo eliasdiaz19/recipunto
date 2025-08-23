@@ -2,7 +2,7 @@
 'use client'
 
 import { useRealtimeStatus } from '@/hooks/useRealtimeStatus'
-import { Badge } from './Badge'
+import Badge from './Badge'
 
 export function RealtimeIndicator() {
   const {
@@ -16,8 +16,8 @@ export function RealtimeIndicator() {
   const getStatusColor = () => {
     if (isConnected) return 'success'
     if (isConnecting) return 'warning'
-    if (hasError) return 'error'
-    return 'secondary'
+    if (hasError) return 'danger'
+    return 'default'
   }
 
   const getStatusText = () => {
@@ -36,15 +36,29 @@ export function RealtimeIndicator() {
 
   return (
     <div className="flex items-center gap-2">
-      <Badge 
-        variant={getStatusColor()}
-        className="flex items-center gap-1 cursor-pointer"
-        onClick={hasError ? reconnect : undefined}
-        title={hasError ? 'Hacer clic para reconectar' : undefined}
-      >
-        <span className="text-xs">{getStatusIcon()}</span>
-        <span className="text-xs font-medium">{getStatusText()}</span>
-      </Badge>
+      {hasError ? (
+        <button
+          onClick={reconnect}
+          title="Hacer clic para reconectar"
+          className="cursor-pointer"
+        >
+          <Badge 
+            variant={getStatusColor()}
+            className="flex items-center gap-1"
+          >
+            <span className="text-xs">{getStatusIcon()}</span>
+            <span className="text-xs font-medium">{getStatusText()}</span>
+          </Badge>
+        </button>
+      ) : (
+        <Badge 
+          variant={getStatusColor()}
+          className="flex items-center gap-1"
+        >
+          <span className="text-xs">{getStatusIcon()}</span>
+          <span className="text-xs font-medium">{getStatusText()}</span>
+        </Badge>
+      )}
       
       {isConnected && lastUpdate && (
         <span className="text-xs text-gray-500">

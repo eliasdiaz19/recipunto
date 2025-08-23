@@ -4,9 +4,9 @@
 import { useState, useEffect } from 'react'
 import { useRealtimeDebug } from '@/hooks/useRealtimeDebug'
 import { useRealtimeStatus } from '@/hooks/useRealtimeStatus'
-import { Card } from './Card'
-import { Button } from './Button'
-import { Badge } from './Badge'
+import Card from './Card'
+import Button from './Button'
+import Badge from './Badge'
 
 export function RealtimeDebugPanel() {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -71,7 +71,7 @@ export function RealtimeDebugPanel() {
             <div className="flex items-center justify-between">
               <span className="text-xs text-gray-300">Estado:</span>
               <Badge 
-                variant={debug.debugInfo.connectionStatus === 'connected' ? 'success' : 'error'}
+                variant={debug.debugInfo.connectionStatus === 'connected' ? 'success' : 'danger'}
                 className="text-xs"
               >
                 {debug.debugInfo.connectionStatus}

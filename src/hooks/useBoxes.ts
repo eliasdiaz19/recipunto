@@ -152,7 +152,7 @@ export function useBoxes() {
     } finally {
       setIsLoading(false)
     }
-  }, [transformBoxData])
+  }, [transformBoxData, debug])
 
   // Función para configurar Realtime con deduplicación
   const setupRealtime = useCallback(() => {
