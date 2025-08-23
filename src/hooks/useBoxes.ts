@@ -98,7 +98,7 @@ export function useBoxes() {
       const currentOperations = Array.from(pendingOperations.current.values())
       debug.updatePendingOperations(currentOperations)
     }
-  }, [debug, debug.logEvent, debug.updatePendingOperations])
+  }, [debug])
 
   // Función para verificar si los datos han cambiado realmente
   const hasDataChanged = useCallback((boxId: string, _newData: any): boolean => {
