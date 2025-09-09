@@ -37,6 +37,14 @@
   --sidebar-accent-foreground: oklch(1 0 0); /* White text */
   --sidebar-border: oklch(0.92 0 0); /* #e5e7eb - Sidebar borders */
   --sidebar-ring: oklch(0.55 0.15 200 / 0.5); /* Focus ring in sidebar */
+  /* Brand palette (colores del post) */
+  --brand-green-50: #F2FBF7;  /* verde muy claro (casi blanco) */
+  --brand-green-100: #9CDAC5; /* acento suave (pedido) */
+  --brand-green-600: #00A17B; /* verde principal */
+  --brand-green-700: #00A17B; /* usar principal hasta definir tono más oscuro */
+  --brand-green-800: #008C6C; /* sutilmente más oscuro del principal */
+  --brand-blue-50: #F2FAFD;   /* azul muy claro (casi blanco) */
+  --brand-blue-600: #2563eb;  /* temporal, define un azul más profundo si quieres */
 }
 
 .dark {
@@ -121,5 +129,20 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /* Reusable subtle card styling for landing */
+  .brand-card {
+    background: #ffffff;
+    border: 1px solid var(--brand-green-100);
+    border-radius: 1rem; /* 16px */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 200ms ease, transform 200ms ease;
+  }
+  .brand-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
   }
 }
