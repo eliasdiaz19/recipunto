@@ -75,17 +75,24 @@ export default function LandingPage() {
 
     setIsLoading(true)
     try {
+      // Formspree espera datos en formato form-urlencoded
+      const formData = new URLSearchParams()
+      formData.append('email', email)
+      formData.append('source', 'landing_page')
+      formData.append('timestamp', new Date().toISOString())
+      
+      console.log('[Landing] Enviando a Formspree:', {
+        endpoint: formEndpoint,
+        email: email,
+        formData: formData.toString()
+      })
+      
       const res = await fetch(formEndpoint, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           "Accept": "application/json",
         },
-        body: JSON.stringify({
-          email,
-          source: "landing_page",
-          timestamp: new Date().toISOString(),
-        }),
+        body: formData,
       })
 
       if (!res.ok) {
