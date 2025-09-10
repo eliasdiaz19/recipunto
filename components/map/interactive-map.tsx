@@ -1,9 +1,9 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback, memo } from "react"
 import { Button } from "@/components/ui/button"
 import { Plus, MapPin } from "lucide-react"
-import type { RecyclingBox } from "./map-interface"
+import type { RecyclingBox } from "@/types/box"
 
 interface InteractiveMapProps {
   boxes: RecyclingBox[]
@@ -14,7 +14,7 @@ interface InteractiveMapProps {
   boxToMove?: RecyclingBox | null
 }
 
-export function InteractiveMap({
+function InteractiveMapComponent({
   boxes,
   onBoxClick,
   onMapClick,
@@ -22,17 +22,27 @@ export function InteractiveMap({
   isMovingBox = false,
   boxToMove = null,
 }: InteractiveMapProps) {
-  const mapRef = useRef<HTMLDivElement>(null)
+  const mapRef = useRef<HTMLDivElement | null>(null)
   const mapInstanceRef = useRef<any>(null)
-  const markersRef = useRef<any[]>([])
+  const markersRef = useRef<Map<string, any>>(new Map())
   const leafletRef = useRef<any>(null)
   const onMapClickRef = useRef(onMapClick)
+  const onBoxClickRef = useRef(onBoxClick)
+  const onDeleteBoxRef = useRef(onDeleteBox)
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [isMapLoaded, setIsMapLoaded] = useState(false)
 
   useEffect(() => {
     onMapClickRef.current = onMapClick
   }, [onMapClick])
+
+  useEffect(() => {
+    onBoxClickRef.current = onBoxClick
+  }, [onBoxClick])
+
+  useEffect(() => {
+    onDeleteBoxRef.current = onDeleteBox
+  }, [onDeleteBox])
 
   useEffect(() => {
     if (!mapRef.current || isMapLoaded) return
@@ -138,19 +148,22 @@ export function InteractiveMap({
 
     const L = leafletRef.current
 
-    markersRef.current.forEach((marker) => {
-      mapInstanceRef.current.removeLayer(marker)
+    // Remove markers that no longer exist
+    const currentIds = new Set(boxes.map((b) => b.id))
+    markersRef.current.forEach((marker, id) => {
+      if (!currentIds.has(id)) {
+        mapInstanceRef.current.removeLayer(marker)
+        markersRef.current.delete(id)
+      }
     })
-    markersRef.current = []
 
-    boxes.forEach((box, index) => {
-      const lat = box.lat || userLocation.lat + (index === 0 ? 0.005 : -0.005)
-      const lng = box.lng || userLocation.lng + (index === 0 ? 0.005 : -0.005)
-
-      console.log("[v0] Placing box", box.id, "at coordinates:", lat, lng)
-
+    boxes.forEach((box) => {
+      const lat = box.lat ?? userLocation.lat
+      const lng = box.lng ?? userLocation.lng
       const isBeingMoved = isMovingBox && boxToMove?.id === box.id
-      const boxIcon = L.divIcon({
+      const isOwner = box.createdBy === "current-user" || box.createdBy === "usuario-anonimo" // TODO: user id real
+
+      const icon = L.divIcon({
         html: `
           <div class="relative group cursor-pointer ${isBeingMoved ? "animate-pulse" : ""}">
             <div class="w-8 h-8 rounded-full border-2 ${isBeingMoved ? "border-yellow-400 border-4" : "border-white"} shadow-lg flex items-center justify-center ${
@@ -168,64 +181,30 @@ export function InteractiveMap({
         iconAnchor: [16, 32],
       })
 
-      const marker = L.marker([lat, lng], { icon: boxIcon }).addTo(mapInstanceRef.current)
 
-      const isOwner = box.createdBy === "current-user" || box.createdBy === "usuario-anonimo"
-      const popupContent = `
-        <div class="p-3 min-w-[220px]">
-          <h3 class="font-semibold text-sm mb-2">Caja de Reciclaje #${box.id}</h3>
-          <p class="text-xs text-gray-600 mb-1">${box.currentAmount}/${box.capacity} envases</p>
-          <p class="text-xs ${box.isFull ? "text-red-600 font-medium" : "text-green-600"} mb-3">
-            ${box.isFull ? "¡Caja llena!" : "Disponible"}
-          </p>
-          ${isBeingMoved ? '<p class="text-xs text-yellow-600 font-medium mb-2">Esta caja se está moviendo...</p>' : ""}
-          <div class="flex gap-2">
-            <button class="flex-1 px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors" onclick="window.openBoxDetails('${box.id}')">
-              Ver detalles
-            </button>
-            ${
-              isOwner && !isBeingMoved
-                ? `
-              <button class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors" onclick="window.deleteBox('${box.id}')" title="Eliminar caja">
-                <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                </svg>
-              </button>
-            `
-                : ""
-            }
-          </div>
-          ${isOwner ? '<p class="text-xs text-gray-500 mt-2">Esta es tu caja</p>' : ""}
-        </div>
-      `
-
-      marker.bindPopup(popupContent)
-
-      if (!isMovingBox) {
-        marker.on("click", () => {
-          onBoxClick(box)
-        })
+      const existing = markersRef.current.get(box.id)
+      if (!existing) {
+        const marker = L.marker([lat, lng], { icon }).addTo(mapInstanceRef.current)
+        if (!isMovingBox) {
+          marker.on("click", () => onBoxClickRef.current(box))
+        }
+        markersRef.current.set(box.id, marker)
+      } else {
+        existing.setLatLng([lat, lng])
+        existing.setIcon(icon)
       }
-
-      markersRef.current.push(marker)
     })
 
     if (typeof window !== "undefined") {
       ;(window as any).openBoxDetails = (boxId: string) => {
         const box = boxes.find((b) => b.id === boxId)
-        if (box && !isMovingBox) {
-          onBoxClick(box)
-        }
+        if (box && !isMovingBox) onBoxClickRef.current(box)
       }
       ;(window as any).deleteBox = (boxId: string) => {
-        if (!isMovingBox) {
-          onDeleteBox(boxId)
-        }
+        if (!isMovingBox) onDeleteBoxRef.current(boxId)
       }
     }
-
-    console.log("[v0] Added", boxes.length, "recycling box markers to map")
-  }, [boxes, isMapLoaded, userLocation, isMovingBox, boxToMove]) // Removed onBoxClick and onDeleteBox from dependencies
+  }, [boxes, isMapLoaded, userLocation, isMovingBox, boxToMove])
 
   useEffect(() => {
     if (mapInstanceRef.current) {
@@ -240,17 +219,17 @@ export function InteractiveMap({
     }
   }, [isMovingBox])
 
-  const centerOnUser = () => {
+  const centerOnUser = useCallback(() => {
     if (mapInstanceRef.current && userLocation) {
       mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 15)
     }
-  }
+  }, [userLocation])
 
-  const zoomIn = () => {
+  const zoomIn = useCallback(() => {
     if (mapInstanceRef.current) {
       mapInstanceRef.current.zoomIn()
     }
-  }
+  }, [])
 
   return (
     <div className="relative h-full w-full">
@@ -282,3 +261,22 @@ export function InteractiveMap({
     </div>
   )
 }
+
+function arePropsEqual(prev: InteractiveMapProps, next: InteractiveMapProps): boolean {
+  if (prev.isMovingBox !== next.isMovingBox) return false
+  if ((prev.boxToMove?.id || null) !== (next.boxToMove?.id || null)) return false
+
+  // Compare boxes by id and key fields used for rendering markers
+  if (prev.boxes.length !== next.boxes.length) return false
+  const toSignature = (b: RecyclingBox) => `${b.id}|${b.lat}|${b.lng}|${b.isFull}|${b.currentAmount}|${b.capacity}|${b.createdBy}`
+  const nextById = new Map(next.boxes.map((b) => [b.id, toSignature(b)]))
+  for (const b of prev.boxes) {
+    const sig = nextById.get(b.id)
+    if (!sig || sig !== toSignature(b)) return false
+  }
+
+  // Ignore function prop identity changes; we use refs internally
+  return true
+}
+
+export const InteractiveMap = memo(InteractiveMapComponent, arePropsEqual)

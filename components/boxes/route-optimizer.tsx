@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Route, Navigation, Clock, MapPin } from "lucide-react"
-import type { RecyclingBox } from "../map/map-interface"
+import type { RecyclingBox } from "@/types/box"
 
 interface RouteOptimizerProps {
   boxes: RecyclingBox[]

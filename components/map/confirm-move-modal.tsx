@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { RecyclingBox } from "./map-interface"
+import type { RecyclingBox } from "@/types/box"
 
 interface ConfirmMoveModalProps {
   isOpen: boolean

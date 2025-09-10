@@ -4,32 +4,41 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
-  // Verificar si el usuario está autenticado
-  // Por ahora usamos una verificación simple, después se integrará con Supabase
-  const isAuthenticated = request.cookies.get('sb-access-token') || 
-                         request.cookies.get('supabase-auth-token')
+  // Verificar si el usuario está autenticado usando las cookies de Supabase
+  const supabaseAccessToken = request.cookies.get('sb-127.0.0.1-3000-auth-token')?.value ||
+                              request.cookies.get('sb-localhost-3000-auth-token')?.value ||
+                              request.cookies.get('supabase.auth.token')?.value ||
+                              request.cookies.get('sb-access-token')?.value
 
-  // Rutas que requieren autenticación
-  const protectedRoutes = ['/app', '/profile', '/notifications', '/admin']
-  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
-
-  // Rutas públicas (landing page y auth)
-  const publicRoutes = ['/', '/login', '/register', '/marketing']
-  const isPublicRoute = publicRoutes.includes(pathname)
-
-  // Si está autenticado y va a la landing page, redirigir a la app
-  if (isAuthenticated && pathname === '/') {
-    return NextResponse.redirect(new URL('/app', request.url))
+  let isAuthenticated = false
+  
+  // Intentar parsear el token de Supabase para verificar autenticación
+  if (supabaseAccessToken) {
+    try {
+      const tokenData = JSON.parse(supabaseAccessToken)
+      isAuthenticated = !!(tokenData.access_token && tokenData.user)
+    } catch {
+      // Si no se puede parsear, verificar si existe el token básico
+      isAuthenticated = !!supabaseAccessToken
+    }
   }
 
-  // Si no está autenticado y va a rutas protegidas, redirigir a login
-  if (!isAuthenticated && isProtectedRoute) {
+  // Rutas que requieren autenticación estricta
+  const strictProtectedRoutes = ['/admin']
+  const isStrictProtectedRoute = strictProtectedRoutes.some(route => pathname.startsWith(route))
+
+  // Rutas públicas (landing page y auth)
+  const publicRoutes = ['/', '/login', '/register', '/marketing', '/map', '/profile', '/notifications', '/boxes']
+  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
+
+  // Solo proteger rutas administrativas estrictamente
+  if (!isAuthenticated && isStrictProtectedRoute) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Si está autenticado y va a login/register, redirigir a la app
+  // Si está autenticado y va a login/register, redirigir al mapa
   if (isAuthenticated && (pathname === '/login' || pathname === '/register')) {
-    return NextResponse.redirect(new URL('/app', request.url))
+    return NextResponse.redirect(new URL('/map', request.url))
   }
 
   return NextResponse.next()

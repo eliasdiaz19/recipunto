@@ -5,8 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { MoreVertical, Edit, Trash2, MapPin, Calendar, User } from "lucide-react"
-import type { RecyclingBox } from "../map/map-interface"
+import type { RecyclingBox } from "@/types/box"
+import { formatCapacityPercentage, formatDate } from "@/lib/formatters"
 import { useToast } from "@/hooks/use-toast"
+import { FillLevelBar } from "@/components/ui/fill-level-bar"
 
 interface BoxCardProps {
   box: RecyclingBox
@@ -92,17 +94,10 @@ export function BoxCard({ box, onEdit, onDelete, isOwner }: BoxCardProps) {
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-muted-foreground">Nivel de llenado</span>
             <span className="text-sm font-medium">
-              {box.currentAmount}/{box.capacity} ({fillPercentage}%)
+              {box.currentAmount}/{box.capacity} ({formatCapacityPercentage(box.currentAmount, box.capacity)})
             </span>
           </div>
-          <div className="w-full bg-muted rounded-full h-2">
-            <div
-              className={`h-2 rounded-full transition-all ${
-                fillPercentage >= 90 ? "bg-destructive" : fillPercentage >= 70 ? "bg-yellow-500" : "bg-secondary"
-              }`}
-              style={{ width: `${fillPercentage}%` }}
-            />
-          </div>
+          <FillLevelBar percentage={fillPercentage} />
         </div>
 
         {/* Location */}
@@ -122,7 +117,7 @@ export function BoxCard({ box, onEdit, onDelete, isOwner }: BoxCardProps) {
         {/* Last Updated */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Calendar className="h-4 w-4" />
-          <span>Actualizada {box.lastUpdated.toLocaleDateString()}</span>
+          <span>Actualizada {formatDate(box.lastUpdated)}</span>
         </div>
 
         {/* Actions */}

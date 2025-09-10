@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { NotificationProvider } from "@/components/notifications/notification-provider"
+import { BoxProvider } from "@/contexts/BoxContext"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,7 +25,9 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`font-sans ${inter.variable} antialiased`}>
-        <NotificationProvider>{children}</NotificationProvider>
+        <BoxProvider>
+          <NotificationProvider>{children}</NotificationProvider>
+        </BoxProvider>
       </body>
     </html>
   )

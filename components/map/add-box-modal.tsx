@@ -2,14 +2,16 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
-import type { RecyclingBox } from "./map-interface"
+import { useBoxFormPersistence } from "@/hooks/useFormPersistence"
+import type { RecyclingBox } from "@/types/box"
+import { validateBoxData } from "@/lib/validators"
 
 interface AddBoxModalProps {
   isOpen: boolean
@@ -19,33 +21,54 @@ interface AddBoxModalProps {
 }
 
 export function AddBoxModal({ isOpen, onClose, onAdd, initialCoordinates }: AddBoxModalProps) {
-  const [formData, setFormData] = useState({
-    currentAmount: "",
-    capacity: "",
-    isFull: false,
-  })
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
+  
+  // Usar persistencia de formulario
+  const {
+    formData,
+    updateField,
+    reset,
+    isDirty,
+    lastSaved
+  } = useBoxFormPersistence({
+    lat: initialCoordinates?.lat || 40.4168,
+    lng: initialCoordinates?.lng || -3.7038,
+    currentAmount: '',
+    capacity: '',
+    isFull: false,
+    notes: ''
+  })
+
+  // Resetear formulario cuando el modal se abra
+  useEffect(() => {
+    if (isOpen) {
+      reset()
+    }
+  }, [isOpen]) // Remover 'reset' de las dependencias para evitar bucle infinito
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
-      const currentAmount = Number.parseInt(formData.currentAmount)
-      const capacity = Number.parseInt(formData.capacity)
-
-      if (currentAmount < 0 || capacity <= 0) {
-        throw new Error("Los valores deben ser positivos")
-      }
-
-      if (currentAmount > capacity) {
-        throw new Error("La cantidad actual no puede ser mayor que la capacidad")
-      }
+      const currentAmount = Number(formData.currentAmount) || 0
+      const capacity = Number(formData.capacity) || 50
 
       const location = initialCoordinates || {
-        lat: 40.4168 + Math.random() * 0.01,
-        lng: -3.7038 + Math.random() * 0.01,
+        lat: formData.lat,
+        lng: formData.lng,
+      }
+
+      const errors = validateBoxData({
+        lat: location.lat,
+        lng: location.lng,
+        capacity,
+        currentAmount,
+      })
+      if (errors.length > 0) {
+        console.warn("Validation errors:", errors)
+        return
       }
 
       onAdd({
@@ -56,32 +79,12 @@ export function AddBoxModal({ isOpen, onClose, onAdd, initialCoordinates }: AddB
         createdBy: "usuario-anonimo",
       })
 
-      toast({
-        title: "¡Caja creada!",
-        description: initialCoordinates
-          ? "La nueva caja de reciclaje ha sido añadida en la ubicación seleccionada"
-          : "La nueva caja de reciclaje ha sido añadida al mapa",
-      })
-
-      // Reset form
-      setFormData({
-        currentAmount: "",
-        capacity: "",
-        isFull: false,
-      })
+      // No resetear aquí - se reseteará cuando el modal se cierre
     } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Error al crear la caja",
-        variant: "destructive",
-      })
+      console.error("Error creating box:", error)
     } finally {
       setIsLoading(false)
     }
-  }
-
-  const updateFormData = (field: string, value: string | boolean) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
   return (
@@ -107,6 +110,14 @@ export function AddBoxModal({ isOpen, onClose, onAdd, initialCoordinates }: AddB
             para obtener puntos y seguir tu impacto ambiental.
           </div>
 
+          {/* Indicador de persistencia */}
+          {isDirty && (
+            <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded border border-blue-200">
+              💾 Formulario guardado automáticamente
+              {lastSaved && ` - ${new Date(lastSaved).toLocaleTimeString()}`}
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="currentAmount">Cantidad actual de envases</Label>
             <Input
@@ -115,7 +126,7 @@ export function AddBoxModal({ isOpen, onClose, onAdd, initialCoordinates }: AddB
               min="0"
               placeholder="0"
               value={formData.currentAmount}
-              onChange={(e) => updateFormData("currentAmount", e.target.value)}
+              onChange={(e) => updateField("currentAmount", e.target.value)}
               required
             />
           </div>
@@ -128,7 +139,7 @@ export function AddBoxModal({ isOpen, onClose, onAdd, initialCoordinates }: AddB
               min="1"
               placeholder="50"
               value={formData.capacity}
-              onChange={(e) => updateFormData("capacity", e.target.value)}
+              onChange={(e) => updateField("capacity", e.target.value)}
               required
             />
           </div>
@@ -137,7 +148,7 @@ export function AddBoxModal({ isOpen, onClose, onAdd, initialCoordinates }: AddB
             <Checkbox
               id="isFull"
               checked={formData.isFull}
-              onCheckedChange={(checked) => updateFormData("isFull", !!checked)}
+              onCheckedChange={(checked) => updateField("isFull", !!checked)}
             />
             <Label htmlFor="isFull" className="text-sm">
               Marcar como llena
